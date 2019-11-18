@@ -1,6 +1,5 @@
 package io.vertx.blog.first;
 
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
@@ -16,7 +15,7 @@ public class FirstWorkerVerticle extends AbstractVerticle {
         consumer.completionHandler(res -> {
             if (res.succeeded()) {
                 fut.complete();
-                System.out.println("The handler registration has reached all nodes");
+                System.out.println("The handler registration has reached all nodes: 1st ");
             } else {
                 fut.fail(res.cause());
                 System.out.println("Registration failed!");

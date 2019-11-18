@@ -15,15 +15,13 @@ public class SecondWorkerVerticle extends AbstractVerticle {
         consumer.completionHandler(res -> {
             if (res.succeeded()) {
                 fut.complete();
-                System.out.println("The handler registration has reached all nodes");
+                System.out.println("The handler registration has reached all nodes: 2nd");
             } else {
                 fut.fail(res.cause());
                 System.out.println("Registration failed!");
             }
         });
         eb.send("SecondWorkerVerticle","Msg from 2nd worker verticle");
-
-
 
     }
 }

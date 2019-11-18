@@ -1,35 +1,33 @@
 package io.vertx.blog.first;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 
 public class MyFirstVerticle extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> fut) {
-        Future<String> firstFurture = Future.future();
+        final Future<String> firstFuture = Future.future();
         Future<String> secondFuture = Future.future();
-        Future<String> thirdFuture = Future.future();
+        final Future<String> thirdFuture = Future.future();
 
         DeploymentOptions options = new DeploymentOptions().setWorker(true);
 
             vertx.deployVerticle(FirstWorkerVerticle.class.getName(), options, result -> {
                 if (result.succeeded()) {
                     System.out.println("Successful");
-                    firstFurture.complete();
+                    firstFuture.complete();
                 } else {
-                    firstFurture.fail(result.cause());
+                    firstFuture.fail(result.cause());
                 }
 
             });
 
 
-        firstFurture.compose(futureResult1 -> {
+        firstFuture.compose(futureResult1 ->{
             vertx.deployVerticle(SecondWorkerVerticle.class.getName(), options, result -> {
+
                 if (result.succeeded()) {
-                    System.out.println("Successful");
+                    System.out.println("Successful 2");
                     secondFuture.complete();
                 } else {
                     secondFuture.fail(result.cause());
@@ -37,16 +35,15 @@ public class MyFirstVerticle extends AbstractVerticle {
 
             });
             return secondFuture;
-        });
-
-        secondFuture.compose(futureResult2 -> {
+        }).compose(futureResult2 -> {
+            System.out.println(" main verticle");
 
             vertx.createHttpServer()
                     .requestHandler(r -> {
                         r.response().end("<h1>Hello from my first " +
                                 "Vert.x 3 application</h1>");
                     })
-                    .listen(result -> {
+                    .listen(8080,result -> {
                         if (result.succeeded()) {
                             System.out.println("http port: " + result.result().actualPort());
                             thirdFuture.complete();
@@ -58,9 +55,11 @@ public class MyFirstVerticle extends AbstractVerticle {
         }).setHandler(asyncResult -> {
             if(asyncResult.succeeded()){
                 System.out.println("Main Verticle deployed");
-                thirdFuture.complete();
+                fut.complete();
             }else {
-                thirdFuture.fail(asyncResult.cause());
+                System.out.println("Main Verticle deploy failed");
+
+                fut.fail(asyncResult.cause());
             }
         });
 
@@ -70,5 +69,6 @@ public class MyFirstVerticle extends AbstractVerticle {
         Vertx vertx = Vertx.vertx();
         vertx.deployVerticle(MyFirstVerticle.class.getName());
     }
+
 
 }
